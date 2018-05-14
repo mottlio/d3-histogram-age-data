@@ -1,7 +1,7 @@
 // write your code here!
 var width = 800;
 var height = 600;
-var padding = 30;
+var padding = 50;
 var barPadding = 1;
 
 //filter the data chosing only complete observations
@@ -26,6 +26,55 @@ var svg = d3.select("svg")
             .attr("width", width)
             .attr("height", height);
 
+//RANGE slider input
+
+d3.select("input")
+    .property("value", bins.length)
+  .on("input", function(){
+      var binCount = +d3.event.target.value;
+      histogram.thresholds(xScale.ticks(binCount));
+      bins = histogram(ageData);
+      yScale.domain([0, d3.max(bins, d => d.length)]);
+
+      d3.select(".y-axis")
+        .call(d3.axisLeft(yScale));
+
+      d3.select(".x-axis")
+        .call(d3.axisBottom(xScale)
+                .ticks(binCount))
+        .selectAll("text")
+          .attr("y", -3)
+          .attr("x", 10)
+          .attr("transform", "rotate(90)")
+          .style("text-anchor", "start");
+
+    var rect = svg
+                .selectAll("rect")
+                .data(bins);
+
+    rect
+      .exit()
+      .remove();
+
+    rect    
+      .enter()
+        .append("rect")
+      .merge(rect)
+        .attr("x", d => xScale(d.x0))
+        .attr("y", d => yScale(d.length))
+        .attr("height", d => height - padding - yScale(d.length))
+        .attr("width", d => xScale(d.x1) - xScale(d.x0) - barPadding)
+        .attr("fill", "blue");
+
+    d3.select(".bin-count")
+        .text("Number of bins: " + bins.length)
+
+  })
+
+
+
+
+//LABELS for the X and Y axis
 
 svg.append("g")
     .attr("transform", "translate(0, " + (height - padding) + ")")
