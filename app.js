@@ -12,7 +12,8 @@ var xScale = d3.scaleLinear()
                 .rangeRound([padding, width - padding]);
 
 var histogram = d3.histogram()
-                .domain(xScale.ticks())
+                .domain(xScale.domain())
+                .thresholds(xScale.ticks())
                 .value(d => d.medianAge);
 
 var bins = histogram(ageData);
